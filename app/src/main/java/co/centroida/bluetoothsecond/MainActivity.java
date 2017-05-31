@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private Handler mHandler;
 
 
-    private static final long SCAN_PERIOD = 20000;
+    private static final long SCAN_PERIOD = 10000;
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
     new BluetoothAdapter.LeScanCallback() {
         @Override
@@ -67,6 +67,15 @@ public class MainActivity extends AppCompatActivity {
             public void itemClicked(BluetoothDevice device) {
                 if (device == null) {
                     return;
+                }else {
+                    final Intent intent = new Intent(MainActivity.this, StatusActivity.class);
+                    intent.putExtra(StatusActivity.EXTRAS_DEVICE_NAME, device.getName());
+                    intent.putExtra(StatusActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+                    if (mScanning) {
+                        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                        mScanning = false;
+                    }
+                    startActivity(intent);
                 }
                 Log.d(TAG, "itemClicked: CLOCK");
             }
@@ -221,8 +230,9 @@ public class MainActivity extends AppCompatActivity {
             final String deviceName = device.getName();
             if (deviceName != null && deviceName.length() > 0)
                 viewHolder.deviceName.setText(deviceName);
-            else
+            else{
                 viewHolder.deviceName.setText("unknown");
+            }
             viewHolder.deviceAddress.setText(device.getAddress());
 
             view.setOnClickListener(new View.OnClickListener() {
